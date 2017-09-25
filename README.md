@@ -37,5 +37,11 @@ This process is more involved than ideal, but you can add songs.
 ## Running It
 To run this, a decent GPU/CPU is needed, depending if hardware acceleration is on or not. Running on low end computers and phones/tablets may have stutering (if so, zooming in should help). Google Chrome and Microsoft Edge are supported, Safari and Firefox may have some compatibility problems, and Internet Explorer isn't supported because the AudioContext object isn't defined.
 
+## Running It On My Computer
+To run this, simply run the command
+`
+/usr/bin/google-chrome --allow-file-access-from-files file:///home/teddy/git-repos/Monstercat-Audio-Spectrum-Visualizer/index.html
+`
+
 ## About Data Encoding
 For now, data can be exported as a Roblox Model XML with the positions of the given bars at the given times. You will need to enable it in /js/helpers/config.js.

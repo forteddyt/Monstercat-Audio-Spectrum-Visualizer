@@ -161,12 +161,15 @@ function EaseSineOut(Number) {
 
 
 function HandleAudio() {
+  if(Paused == true){
+    return
+  }
+
   UpdateTextVisibility()
   if (StartTime == 0) {
     ResizeFrames(0,0)
     return
   }
-
 
   var Time = Date.now()
   var Frame = -1
@@ -212,6 +215,11 @@ function HandleAudio() {
   Analyser.getByteFrequencyData(DataArray)
   var VisualData = GetVisualBins(DataArray)
   var TransformedVisualData = TransformToVisualBins(VisualData)
+
+  console.log(VisualData)
+  console.log(TransformedVisualData)
+  date = new Date(Time);
+  console.log("Time: " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds())
 
   var NewSeperation = Bar1080pSeperation * Mult
   var NewBarWidth = Bar1080pWidth * Mult
