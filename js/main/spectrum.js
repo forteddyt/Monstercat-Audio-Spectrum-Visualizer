@@ -161,9 +161,9 @@ function EaseSineOut(Number) {
 
 
 function HandleAudio() {
-  if(Paused == true){
-    return
-  }
+  // if(Paused == true){
+  //   return
+  // }
 
   UpdateTextVisibility()
   if (StartTime == 0) {
@@ -216,30 +216,37 @@ function HandleAudio() {
   var VisualData = GetVisualBins(DataArray)
   var TransformedVisualData = TransformToVisualBins(VisualData)
 
-  console.log(VisualData)
-  console.log(TransformedVisualData)
-  date = new Date(Time);
-  console.log("Time: " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds())
-
   var NewSeperation = Bar1080pSeperation * Mult
   var NewBarWidth = Bar1080pWidth * Mult
 
   if (EncodingEnabled == true) {
     if (Frame != -1 && LastFrame != Frame) {
+      // date = new Date(Time);
+      // console.log("Time: " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + ":" + date.getMilliseconds())
+
       LastFrame = Frame
-      CompiledSongData = CompiledSongData + "\n[" + Frame + "] = {"
+      CompiledSongData = CompiledSongData + '[' // Start current frame's record
       if (EncodeRawData == true) {
+        // console.log(VisualData)
         for (var i = 0; i < SpectrumBarCount; i++) {
           var Height = VisualData[i]/255
-          CompiledSongData = CompiledSongData + Math.floor(Height*RecordDownScale) + ","
+          CompiledSongData = CompiledSongData + Math.floor(Height*RecordDownScale)
+          if(i != SpectrumBarCount - 1){ // Seperate values by a comma, unless it's the last value
+            CompiledSongData = CompiledSongData + ","
+          }
         }
       } else {
+        // console.log(TransformedVisualData)
         for (var i = 0; i < SpectrumBarCount; i++) {
           var Height = TransformedVisualData[i]/255
-          CompiledSongData = CompiledSongData + Math.floor(Height*RecordDownScale) + ","
+          CompiledSongData = CompiledSongData + Math.floor(Height*RecordDownScale)
+          if(i != SpectrumBarCount - 1){ // Seperate values by a comma, unless it's the last value
+            CompiledSongData = CompiledSongData + ","
+          }
         }
       }
-      CompiledSongData = CompiledSongData + "},"
+      CompiledSongData = CompiledSongData + '],'  // Finish current frame's record
+                                                  // Removal of last trailing comma done in songutil
     }
   }
 

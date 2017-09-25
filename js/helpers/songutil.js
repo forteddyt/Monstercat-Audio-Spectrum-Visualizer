@@ -27,7 +27,7 @@ var SongName = ""
 var GenreName = ""
 var SingleLineSongName = ""
 var SingleLineArtistName = ""
-var CompiledSongData = "return {"
+var CompiledSongData = "{"
 
 var BackgroundWidth = 0
 var BackgroundHeight = 0
@@ -176,6 +176,11 @@ function LoadSound(Url,ArtistLogo,Album) {
   }
   var NextSongData = Songs[SongOrder[NextSongSpot]]
   GetAudioSource("songs/" + NextSongData[3],function(){})
+
+  if (IndluceFileMetadata == true || IndluceRecordMetadata == true){
+    CompiledSongData = CompiledSongData + "," // Check if there are records before this
+  }
+  CompiledSongData = CompiledSongData + '"song_visual_data":['
 }
 
 
@@ -322,13 +327,20 @@ function PlayRandomSong(){
   }
 
   if (IndluceFileMetadata == true) {
-    CompiledSongData = CompiledSongData + "\n\tArtistName = \"" + ArtistName + "\","
-    CompiledSongData = CompiledSongData + "\n\tSongName = \"" + SingleLineSongName + "\","
-    CompiledSongData = CompiledSongData + "\n\tGenreName = \"" + GenreName + "\","
+    CompiledSongData = CompiledSongData + '"file_metadata":{' // Start file metadata record
+    CompiledSongData = CompiledSongData + '"name":"' + SongName.replace("<br>", " ") + '"'
+    CompiledSongData = CompiledSongData + ',"artist":"' + ArtistName.replace("<br>", " ") + '"'
+    CompiledSongData = CompiledSongData + ',"genre":"' + GenreName.replace("<br>", " ") + '"'
+    CompiledSongData = CompiledSongData + '}' // Finish file metadata record
   }
   if (IndluceRecordMetadata == true) {
-    CompiledSongData = CompiledSongData + "\n\tRecordFrequency = " + RecordFrequency + ","
-    CompiledSongData = CompiledSongData + "\n\tRecordDownScale = " + RecordDownScale + ","
+    if(IndluceFileMetadata == true){
+      CompiledSongData = CompiledSongData + "," // New record is not the first record, so insert comma
+    }
+    CompiledSongData = CompiledSongData + '"record_metadata":{' // Start record metadata record
+    CompiledSongData = CompiledSongData + '"frequency":' + RecordFrequency + ''
+    CompiledSongData = CompiledSongData + ',"down_scale":' + RecordDownScale + ''
+    CompiledSongData = CompiledSongData + '}' // Finish record metadata record
   }
 
   NextAlbumRotation = 0
@@ -344,14 +356,24 @@ function ForceStop() {
   Paused = false
   CurrentTimeOffset = 0
   if (DownloadSongData == true) {
-    var ModuleName = ArtistName + "_" + SongName
-    CompiledSongData  = '<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4"> <External>null</External> <External>nil</External> <Item class="ModuleScript" referent="RBX040E8D154ACF48B48C3F54832CED08C8"><Properties> <Content name="LinkedSource"><null></null></Content> <string name="Name">' + ModuleName + '</string> <ProtectedString name="Source"><![CDATA[' + CompiledSongData;
-    CompiledSongData  = CompiledSongData  + "\n}";
-    CompiledSongData  = CompiledSongData +  ']]></ProtectedString> </Properties> </Item> </roblox>';
-    var FileName = ArtistName + " - " + SongName + " Exported Song Data.rbxmx"
+    if (EncodingEnabled == true && CompiledSongData.substring(CompiledSongData.length - 1, CompiledSongData.length) == ",") {
+      CompiledSongData = CompiledSongData.substring(0, CompiledSongData.length - 1); // Remove extra, trailing comma
+      CompiledSongData = CompiledSongData + "]" // finish compiling encoded data
+    }
+
+    
+    if(DownloadSongData == true || IndluceFileMetadata == true || IndluceRecordMetadata == true){
+      CompiledSongData = CompiledSongData + ',' // New record is not the first record, so insert comma
+    }
+    CompiledSongData = CompiledSongData + '"forced_stop":' + wasForced
+    
+    wasForced = false
+
+    CompiledSongData = CompiledSongData + "}" // finish compiling song data
+    var FileName = ArtistName + " - " + SongName + " Exported Song Data.json"
     download(CompiledSongData, FileName, "text/plain");
   }
-  CompiledSongData = "return {"
+  CompiledSongData = "{" // restart compiling song data
   LastFrame = 0
   PlayRandomSong()
 }

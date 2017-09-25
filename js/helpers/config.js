@@ -6,9 +6,9 @@ var IndluceFileMetadata = true //If true, metadata such as the song and artist n
 var EncodeRawData = false //If true, data is encoded raw (untransformed in analysis.js)
 var EncodeEnabledByDefault = false //If true, encoding is enabled by default (no need to press e). More for personal use.
 
-var FrameCap = 1 //Caps the math to the given frame rate. By default, it is able to run faster than your framerate.
+var FrameCap = 60 //Caps the math to the given frame rate. By default, it is able to run faster than your framerate.
 
-var ParticlesEnabled = true //If true, particles in the background will be enabled. Particles are more CPU intensive tha without them.
+var ParticlesEnabled = false //If true, particles in the background will be enabled. Particles are more CPU intensive tha without them.
 
 
 
@@ -42,6 +42,7 @@ var DisplayTime = 3
 //songutil.js
 var BufferInterval = 1024
 var FFTSize = 16384
+var wasForced = false // Dynamic variable to determine if song was skipped or not
 
 
 

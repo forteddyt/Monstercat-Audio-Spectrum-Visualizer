@@ -98,6 +98,7 @@ Body.addEventListener("keydown", function(Key) {
       UpdateText()
     } else if (KeyCode == "KeyO") {
       if (Stopped != true) {
+        wasForced = true
         Stopped = true
         AlbumImage.style.width = "0px"
         AlbumImage.style.left = "0px"
@@ -111,7 +112,7 @@ Body.addEventListener("keydown", function(Key) {
         if (Source && Paused == false) {
           Source.stop()
         } else {
-          ForceStop()
+          ForceStop(true)
         }
       }
     }
