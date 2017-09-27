@@ -498,7 +498,10 @@ function ForceStop() {
     var FileName = ArtistName + " - " + SongName + " Exported Song Data.json"
     download(CompiledSongData, FileName, "application/json");
   }
-  CompiledSongData = "{" // restart compiling song data
+
+  if(SongSpot + 1 < Songs.length){
+    CompiledSongData = "{" // restart compiling song data
+  }
   LastFrame = 0
   // PlayRandomSong() // For the purpose of data collection, don't play randomly
   PlayNextSong()
