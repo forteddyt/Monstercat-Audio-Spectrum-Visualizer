@@ -496,7 +496,7 @@ function ForceStop() {
 
     CompiledSongData = CompiledSongData + "}" // finish compiling song data
     var FileName = ArtistName + " - " + SongName + " Exported Song Data.json"
-    download(CompiledSongData, FileName, "text/plain");
+    download(CompiledSongData, FileName, "application/json");
   }
   CompiledSongData = "{" // restart compiling song data
   LastFrame = 0
