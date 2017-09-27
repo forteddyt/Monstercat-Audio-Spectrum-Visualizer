@@ -218,9 +218,19 @@ function GetTableLength(Table) {
 	return Total
 }
 
+function GetTableOfNumbers(Numbers){
+  var Table = []
+  
+  for (var i = 0; i < Numbers; i++){
+    Table[i] = i
+  }
+
+  return Table
+}
+
 function GetRandomTableOfNumbers(Numbers) {
 	var Table = []
-	var ValuesLeft = []
+  var ValuesLeft = []
 
 	for (var i = 0; i < Numbers; i++) {
 		ValuesLeft[i] = i
@@ -237,6 +247,121 @@ function GetRandomTableOfNumbers(Numbers) {
 		}
 	}
 	return Table
+}
+
+function PlayNextSong(){
+  console.log("Playing next song...")
+
+  SongSpot++
+  if (SongSpot > Songs.length - 1){
+    console.log("Ending Playlist")
+    SongSpot = -1
+  }
+
+  var SongData = Songs[SongOrder[SongSpot]]
+  ArtistName = SongData[0]
+  SongName = SongData[1]
+  SingleLineSongName = RemoveNewLines(SongName)
+  SingleLineArtistName = RemoveNewLines(ArtistName)
+  GenreName = SongData[2]
+  var FileName = "songs/" + SongData[3]
+  var ArtistLogo = SongData[4]
+  var Album = SongData[5]
+
+
+  GenreColor = GetColorFromGenre(GenreName)
+
+  if (EncodeEnabledByDefault == true) {
+    DownloadSongData = true
+  } else {
+    DownloadSongData = false
+  }
+
+  RevertCustomBackgroundChanges()
+
+  var SongBackgroundOverride = SongBackgrounds[SingleLineSongName]
+  var AlbumBackgroundOverride = AlbumBackgrounds[Album]
+  var ArtistBackgroundOverride = ArtistBackgrounds[ArtistName]
+
+  var FullBackgroundData
+  if (SongBackgroundOverride) {
+    if (SongBackgroundOverride[0]) {
+      FullBackgroundData = SongBackgroundOverride[0]
+    }
+    if (SongBackgroundOverride[1]) {
+      GenreColor = SongBackgroundOverride[1]
+    }
+    if (SongBackgroundOverride[2]) {
+      SongBackgroundOverride[2]()
+    }
+  } else if (AlbumBackgroundOverride) {
+    if (AlbumBackgroundOverride[0]) {
+      FullBackgroundData = AlbumBackgroundOverride[0]
+    }
+    if (AlbumBackgroundOverride[1]) {
+      GenreColor = AlbumBackgroundOverride[1]
+    }
+    if (AlbumBackgroundOverride[2]) {
+      AlbumBackgroundOverride[2]()
+    }
+  } else if (ArtistBackgroundOverride) {
+    if (ArtistBackgroundOverride[0]) {
+      FullBackgroundData = ArtistBackgroundOverride[0]
+    }
+    if (ArtistBackgroundOverride[1]) {
+      GenreColor = ArtistBackgroundOverride[1]
+    }
+    if (ArtistBackgroundOverride[2]) {
+      ArtistBackgroundOverride[2]()
+    }
+  }
+
+
+  if (FullBackgroundData) {
+    DrawParticles = false
+    var BackgroundData = FullBackgroundData[Math.floor(Math.random() * FullBackgroundData.length)]
+    BackgroundImage.src = BackgroundData[0]
+    BackgroundWidth = BackgroundData[1]
+    BackgroundHeight = BackgroundData[2]
+    ColorBackground.style.backgroundColor = BackgroundData[3]
+  } else {
+    DrawParticles = true
+    BackgroundImage.src = "img/blankpixel.png"
+    ColorBackground.style.backgroundColor = "#000000"
+  }
+
+  MainDiv.style.display = "none"
+  LoadingDiv.style.display = "block"
+  document.title = "Loading..."
+  if (GenreName != "") {
+    LoadingText.innerHTML = "Loading...<br>[" + GenreName + "] " + SingleLineArtistName + " - " + SingleLineSongName
+  } else {
+    LoadingText.innerHTML = "Loading...<br>" + SingleLineArtistName + " - " + SingleLineSongName
+  }
+
+  if (IndluceFileMetadata == true) {
+    CompiledSongData = CompiledSongData + '"file_metadata":{' // Start file metadata record
+    CompiledSongData = CompiledSongData + '"name":"' + SongName.replace("<br>", " ") + '"'
+    CompiledSongData = CompiledSongData + ',"artist":"' + ArtistName.replace("<br>", " ") + '"'
+    CompiledSongData = CompiledSongData + ',"genre":"' + GenreName.replace("<br>", " ") + '"'
+    CompiledSongData = CompiledSongData + '}' // Finish file metadata record
+  }
+  if (IndluceRecordMetadata == true) {
+    if(IndluceFileMetadata == true){
+      CompiledSongData = CompiledSongData + "," // New record is not the first record, so insert comma
+    }
+    CompiledSongData = CompiledSongData + '"record_metadata":{' // Start record metadata record
+    CompiledSongData = CompiledSongData + '"frequency":' + RecordFrequency + ''
+    CompiledSongData = CompiledSongData + ',"down_scale":' + RecordDownScale + ''
+    CompiledSongData = CompiledSongData + '}' // Finish record metadata record
+  }
+
+  NextAlbumRotation = 0
+  AlbumRotations = []
+  NextTextCycle = 0
+  TextCycles = []
+  LoadSound(FileName,ArtistLogo,Album)
+  CreateNewFleck()
 }
 
 function PlayRandomSong(){
@@ -375,7 +500,8 @@ function ForceStop() {
   }
   CompiledSongData = "{" // restart compiling song data
   LastFrame = 0
-  PlayRandomSong()
+  // PlayRandomSong() // For the purpose of data collection, don't play randomly
+  PlayNextSong()
 }
 
 function CreateSourceBuffer(ExistingBuffer) {
@@ -394,7 +520,8 @@ function CreateSourceBuffer(ExistingBuffer) {
 }
 
 function InitializeSpectrumHandler() {
-  SongOrder = GetRandomTableOfNumbers(Songs.length)
+  // SongOrder = GetRandomTableOfNumbers(Songs.length) // No randomness needed for data collection
+  SongOrder = GetTableOfNumbers(Songs.length)
   AudioNode.onaudioprocess = HandleAudio
   Analyser.fftSize = FFTSize
   Analyser.smoothingTimeConstant = 0
